@@ -1,15 +1,14 @@
+// A generic onclick callback function.
+function genericOnClick(info, tab) {
+  console.log("info: " + JSON.stringify(info));
+  console.log(info);
+  let srcURL = info.srcUrl;
+  console.log(srcURL);
+  chrome.tabs.create({ url: srcURL });
+}
 
-chrome.runtime.onInstalled.addListener(function() {
-    chrome.storage.sync.set({color: '#3aa749'}, function() {
-      console.log("The color is green.");
-    });
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {hostEquals: 'developer.chrome.com'},
-        })
-        ],
-            actions: [new chrome.declarativeContent.ShowPageAction()]
-      }]);
-    });
-  });
+let take_me = chrome.contextMenus.create({
+  "title": "Take me here!",
+  "contexts": ["image"],
+  "onclick": genericOnClick
+});
