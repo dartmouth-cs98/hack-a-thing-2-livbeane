@@ -4,7 +4,6 @@ const API_URL = 'https://vision.googleapis.com/v1/images:annotate?key=';
 function genericOnClick(info, tab) {
   let srcUrl = info.srcUrl;
   console.log(srcUrl);
-  chrome.tabs.create({ url: srcUrl });
 
   let body = {
     "requests": [
@@ -30,10 +29,13 @@ function genericOnClick(info, tab) {
   }).then(function(response) {
     return response.json();
   }).then(function(response) {
-    console.log(response.responses[0].landmarkAnnotations[0].description);
+    let location = response.responses[0].landmarkAnnotations[0].description;
+    location = location.split(' ').join('+');
+    console.log(location);
+    chrome.tabs.create({ url: 'https://www.google.com/maps/dir/?api=1&destination=' + location + '&travelmode=driving' });
   })
   .catch((error) => {
-    console.log('Error with axios call');
+    alert('Sorry, we could not figure out where this image was taken :(');
   });
 }
 
