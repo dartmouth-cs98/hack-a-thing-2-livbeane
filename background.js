@@ -1,7 +1,7 @@
 const API_URL = 'https://vision.googleapis.com/v1/images:annotate?key=';
 
 // A generic onclick callback function.
-function genericOnClick(info, tab) {
+function genericOnClick(info, tab, callback) {
   // Get url of image
   let srcUrl = info.srcUrl;
   console.log(srcUrl);
@@ -34,16 +34,8 @@ function genericOnClick(info, tab) {
   }).then(function(response) {
     // strip landmark from response
     let location = response.responses[0].landmarkAnnotations[0].description;
-    // format the landmark for google maps
-    maps_loc = location.split(' ').join('+');
-    // format the landmark for wikipedia
-    wiki_loc = location.split(' ').join('_');
-    console.log(maps_loc);
-    console.log(wiki_loc);
-    // open up a new tab with directions from current location to landmark
-    chrome.tabs.create({ url: 'https://www.google.com/maps/dir/?api=1&destination=' + maps_loc + '&travelmode=driving' });
-    // open up a new tab with wikipedia page for landmark
-    chrome.tabs.create({ url: 'https://en.wikipedia.org/wiki/' + wiki_loc });
+
+    callback(location);
   })
   .catch((error) => {
     // let user know if could not determine landmark
@@ -51,9 +43,43 @@ function genericOnClick(info, tab) {
   });
 }
 
+function mapsOnClick(info, tab){
+  genericOnClick(info, tab, (location) => {
+    // format the landmark for google maps
+    maps_loc = location.split(' ').join('+');
+    console.log(maps_loc);
+    // open up a new tab with maps page for landmark
+    chrome.tabs.create({ url: 'https://www.google.com/maps/dir/?api=1&destination=' + maps_loc + '&travelmode=driving' });
+  });
+}
+
+function wikiOnClick(info, tab){
+  genericOnClick(info, tab, (location) => {
+    // format the landmark for wikipedia
+    wiki_loc = location.split(' ').join('_');
+    console.log(wiki_loc);
+    // open up a new tab with wikipedia page for landmark
+    chrome.tabs.create({ url: 'https://en.wikipedia.org/wiki/' + wiki_loc });
+  });
+}
+
 // adds option for right-click on images
 let take_me = chrome.contextMenus.create({
   "title": "Take me here!",
   "contexts": ["image"],
-  "onclick": genericOnClick
+  "id": "parent",
+});
+let wiki_tab = chrome.contextMenus.create({
+  "title": "Wikipedia",
+  "contexts": ["image"],
+  "parentId": "parent",
+  "id": "child1",
+  "onclick": wikiOnClick,
+});
+let maps_tab = chrome.contextMenus.create({
+  "title": "GoogleMaps",
+  "contexts": ["image"],
+  "parentId": "parent",
+  "id": "child2",
+  "onclick": mapsOnClick,
 });

@@ -6,5 +6,9 @@
   "background": {
     "scripts": ["api_key.js", "background.js"]
   },
+
+  "icons": {
+    "16": "take_me_there_icon.png"
+  },
   "manifest_version": 2
 }
