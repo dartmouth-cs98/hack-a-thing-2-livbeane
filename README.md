@@ -1,0 +1,1 @@
+We built a chrome extension that will provide the user with directions to a location or information about that location, based on an image. This extension utilizes the cloud vision api to identify landmarks based on images. 
